@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Valentine Website</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Pinyon+Script&family=EB+Garamond&family=Caveat&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+body{
+  margin:0;
+  overflow:hidden;
+  font-family:'EB Garamond', serif;
+}
+
+.page{
+  position:absolute;
+  width:100%;
+  height:100%;
+  display:none;
+  opacity:0;
+  transition:opacity .8s ease;
+}
+
+.active{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  opacity:1;
+}
+
+button{
+  padding:12px 24px;
+  margin:10px;
+  font-size:20px;
+  border:none;
+  cursor:pointer;
+  background:#E9D4C3;
+  color:#0A1123;
+}
+
+/* page colors */
+#page1{background:linear-gradient(#0A1123,#E9D4C3);}
+#page2{background:#4E0000;color:#B3C9D6;}
+#page3{background:#E9D4C3;color:#0A1123;}
+#page4{background:#E9D4C3;color:#4E0000;}
+#page5{background:#0A1123;color:#E9D4C3;}
+#page6{background:#0A1123;color:#E9D4C3;}
+
+/* puzzle */
+#puzzle{
+  display:grid;
+  grid-template-columns:repeat(8,60px);
+  grid-template-rows:repeat(6,60px);
+  gap:2px;
+}
+
+.tile{
+  width:60px;
+  height:60px;
+  background-size:480px 360px;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<!-- PAGE 1 -->
+<div id="page1" class="page active">
+<h1 style="font-family:'Pinyon Script';font-size:64px;">
+Happy Valentine and Monthsarry
+</h1>
+<button onclick="go(2)">explore</button>
+</div>
+
+<!-- PAGE 2 -->
+<div id="page2" class="page">
+<h2>Home</h2>
+<button onclick="go(3)">mini game</button>
+<button onclick="go(4)">letter</button>
+<button onclick="go(5)">songs</button>
+</div>
+
+<!-- PAGE 3 PUZZLE -->
+<div id="page3" class="page">
+<h2>Puzzle</h2>
+<div id="puzzle"></div>
+<div>
+<button onclick="go(6)">next</button>
+<button onclick="go(2)">home</button>
+</div>
+</div>
+
+<!-- PAGE 4 LETTER -->
+<div id="page4" class="page">
+<div style="max-width:600px;font-family:'Caveat';font-size:28px;text-align:center;">
+Happy Valentine and Monthsarry, Sayang.
+Dadda tahu tahun ini bahkan tahun sebelumnya menjadi tahun yang cukup berat untuk kita,
+dan untuk hubungan kita.
+Dadda minta maaf untuk segala hal yang dadda lakukan yang bikin kamu sedih dan kecewa.
+Pastinya, dadda masih sayang juga ke kamu.
+I really love you so much.
+</div>
+<div>
+<button onclick="go(5)">next</button>
+<button onclick="go(2)">home</button>
+</div>
+</div>
+
+<!-- PAGE 5 SONG -->
+<div id="page5" class="page">
+<iframe style="border-radius:12px"
+src="https://open.spotify.com/embed/track/5veo3ShtaQo77WE7dcOOAE?utm_source=generator&autoplay=1"
+width="300" height="380" frameborder="0" allow="autoplay"></iframe>
+<div>
+<button onclick="go(6)">next</button>
+<button onclick="go(2)">home</button>
+</div>
+</div>
+
+<!-- PAGE 6 END -->
+<div id="page6" class="page">
+<h1 style="font-family:'Pinyon Script';font-size:60px;text-align:center;">
+Terima kasih sudah membersamai sepanjang ini.
+I really love you so much
+</h1>
+</div>
+
+<script>
+function go(n){
+document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+let next=document.getElementById("page"+n);
+next.style.display="flex";
+setTimeout(()=>next.classList.add("active"),50);
+}
+
+/* PUZZLE */
+const img="puzzle.png"; // <-- FIXED
+const puzzle=document.getElementById("puzzle");
+let tiles=[];
+
+for(let y=0;y<6;y++){
+for(let x=0;x<8;x++){
+tiles.push({x,y});
+}}
+
+tiles.sort(()=>Math.random()-0.5);
+
+tiles.forEach((t,i)=>{
+let d=document.createElement("div");
+d.className="tile";
+d.style.backgroundImage=`url(${img})`;
+d.style.backgroundPosition=`-${t.x*60}px -${t.y*60}px`;
+d.dataset.correct=i;
+puzzle.appendChild(d);
+});
+
+let selected=null;
+
+puzzle.addEventListener("click",e=>{
+if(!e.target.classList.contains("tile"))return;
+if(!selected){selected=e.target;return;}
+
+let a=selected.style.backgroundPosition;
+selected.style.backgroundPosition=e.target.style.backgroundPosition;
+e.target.style.backgroundPosition=a;
+selected=null;
+
+checkWin();
+});
+
+function checkWin(){
+let win=true;
+[...puzzle.children].forEach((tile,i)=>{
+if(tile.dataset.correct!=i)win=false;
+});
+if(win){
+confetti();
+}
+}
+</script>
+
+</body>
+</html>
